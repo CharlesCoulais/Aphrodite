@@ -1,9 +1,4 @@
 
-
-// snippet
-const DOMContentLoaded = () => new Promise(resolve => ['complete', 'loaded'].includes(document.readyState) ? resolve(document.readyState) : window.addEventListener('DOMContentLoaded', e => resolve(document.readyState)));
-
-
 function aphroditeFunction(...args) {
   const elements = aphroArgsToElementList(args);
   return createStyleSetterProxy(elements);
@@ -138,8 +133,9 @@ export class AphroditeStyleSheet extends CSSStyleSheet {
     const encodedSelector = this.#encodeSelector(selector);
 
     const propertiesStr = Object.entries(propObj)
-      .map(([rawPropertyName, propertyValue]) => {
+      .map(([rawPropertyName, rawPropertyValue]) => {
         const propertyName = rawPropertyName.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
+        const propertyValue = rawPropertyValue.toString().replace(/\!$/, '!important');
         return `  ${propertyName}: ${propertyValue};`;
       })
       .join('\n');
@@ -172,6 +168,7 @@ class ClassNameRegistry {
     if (prefix?.length) {
       this.#uniqPrefix = `${prefix}_`;
     }
+
     if (prefix === '') {
       this.#uniqPrefix = '';
     }
@@ -212,8 +209,8 @@ class ClassNameRegistry {
     while (!uniqName || ClassNameRegistry.#uniqKeySet.has(uniqName)) {
       uniqName = ClassNameRegistry.#generateKey();
     }
-    ClassNameRegistry.#uniqKeySet.add(uniqName);
 
+    ClassNameRegistry.#uniqKeySet.add(uniqName);
     return uniqName;
   }
 
